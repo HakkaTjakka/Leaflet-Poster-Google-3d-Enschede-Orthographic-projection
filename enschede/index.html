@@ -4,9 +4,9 @@
 
 <html>
 	<head>
-	<link rel="stylesheet" href="./leaflet.css">
-		<link rel="stylesheet" href="https://leafletjs-cdn.s3.amazonaws.com/content/leaflet/master/leaflet.css">
+		<link rel="stylesheet" href="./leaflet.css">
 			<!--
+		<link rel="stylesheet" href="https://leafletjs-cdn.s3.amazonaws.com/content/leaflet/master/leaflet.css">
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 				integrity="sha256-/kKa/MBRSJ8JM7ecDwZOQjuL7BuoylV0n40wYn+QFR4="
@@ -18,10 +18,12 @@
 			-->
 		</link>
 	
-		<script type="text/javascript" src="./leaflet.js"></script>
+		<script src="./leaflet-src.js"></script>
 
 <!--
+		<script type="text/javascript" src="./leaflet.js"></script>
 		<script src="./leaflet2.js"></script>
+
 		<script src="./leaflet.gl.js"></script>
 		<script src="https://leafletjs-cdn.s3.amazonaws.com/content/leaflet/master/leaflet-src.js"></script>
 
@@ -148,6 +150,34 @@ crossorigin=""
 				<!-- LEN_RIGHT=211935.46540017053
 				<!-- LEN_LEFT= 209006.12154656276
 
+
+
+//L.CRS.CustomZoom = L.extend({}, L.CRS.Simple, {
+//    scale: function (zoom) {
+//        // This method should return the tile grid size
+//        // (which is always square) for a specific zoom
+//        // We want 0 = 200px = 2 tiles @ 100x100px,
+//        // 1 = 300px = 3 tiles @ 100x100px, etc.
+//        // Ie.: (200 + zoom*100)/100 => 2 + zoom
+//
+//        return zoom;
+//    }
+//});
+
+//var map = L.map('map', { crs: L.CRS.CustomZoom }).setView([0, 0], 0);
+
+			function checkFileExist(urlToFile) {
+				var xhr = new XMLHttpRequest();
+				xhr.open('HEAD', urlToFile, false);
+				xhr.send();
+				 
+				if (xhr.status == "404") {
+					return false;
+				} else {
+					return true;
+				}
+			}
+
 			function bte121_region_coords_to_real_latlng(x,z) {
 			    top_left =[ 3098732.937711787  , -5572933.950075601  ];
 				top_right=[ 3383947.8832087284 , -5484947.531326232  ];
@@ -157,19 +187,25 @@ crossorigin=""
 			}
 			
 			var map = L.map('map', {
+//jow
 				crs: L.CRS.Simple,
+//				crs: L.CRS.CustomZoom,
 				attributionControl: false,
 //				center: [1306.968576, 774.784128], 
 //				center: [0.07977103125, 0.0472890703125], 
 //				center: [10.226391669501, 6.1509095243], 
 				<!-- Somewhere in Utrecht. Note. tile latlng here are not geo's (tpll projection, needs other conversions... See proj-obj Python scripts for other conversions/batch conversions mc / geo)
-				center: [-0.1727975446391117, 0.38631668582527623	],
+				center: [-0.12158012752635927, 128.19290790619448],
 				zoom: 18,
 				minZoom: 1,
 				maxZoom: 18,
 				maxNativeZoom: 18,
 				tileSize: 512,
-				zoomOffset: -7, <!-- ??
+				zoomOffset: -1, <!-- ??
+				zoomDelta: 0.5,
+				wheelPxPerZoomLevel: 1024,
+//				setZoom: 0.5
+//				zoomSnap: 0.25
 				zoomControl: true
 			});
 
@@ -208,25 +244,51 @@ crossorigin=""
 <!--				return "http://192.168.178.28/map/" + coords.z + "/" + mc_x + "/" + mc_y + "/r." + coords.x + "." + coords.y + ".png";
 <!-- Only .jpg lower zoom levels, last .png
 
-					if (coords.x<1024 && coords.x>=0 && coords.y<512 && coords.y>=0) {
+					if (coords.x<1024/div && coords.x>=0 && coords.y<512/div && coords.y>=0) {
 						var mc_x; if ( coords.x >= 0 ) {	mc_x = Math.floor( coords.x/10 ); } else { mc_x = -Math.floor( -((coords.x+1)/10-1) ); }
 						var mc_y; if ( coords.y >= 0 ) {	mc_y = Math.floor( coords.y/10 ); } else { mc_y = -Math.floor( -((coords.y+1)/10-1) ); }
-						return "http://83.83.222.154/amsterdam_tiles/" + coords.z + "/" + mc_x + "/" + mc_y + "/r." + coords.x + "." + coords.y + ".jpg";
-					} else if (coords.x<2048 && coords.x>=1024 && coords.y<1024 && coords.y>=512) {
-						var c_x=coords.x-1024;
-						var c_y=coords.y-512;
+//						return "http://83.83.222.154/amsterdam_tiles/" + coords.z + "/" + mc_x + "/" + mc_y + "/r." + coords.x + "." + coords.y + ".jpg";
+
+						var file = "http://83.83.222.154/amsterdam_tiles/" + coords.z + "/" + mc_x + "/" + mc_y + "/r." + coords.x + "." + coords.y + ".jpg";
+
+						if (checkFileExist(file)) {
+							return file;
+						} else {
+//							return("http://83.83.222.154/enschede_tiles/skull.png");
+						}
+
+					} else if (coords.x-131072/div<131072/div && coords.x-131072/div>=0 && coords.y<512/div && coords.y>=0) {
+						var c_x=coords.x-131072/div;
+						var c_y=coords.y;
 						var mc_x; if ( c_x >= 0 ) {	mc_x = Math.floor( c_x/10 ); } else { mc_x = -Math.floor( -((c_x+1)/10-1) ); }
 						var mc_y; if ( c_y >= 0 ) {	mc_y = Math.floor( c_y/10 ); } else { mc_y = -Math.floor( -((c_y+1)/10-1) ); }
-						return "http://83.83.222.154/enschede_tiles/" + coords.z + "/" + mc_x + "/" + mc_y + "/r." + c_x + "." + c_y + ".jpg";
+						var file = "http://83.83.222.154/enschede_tiles/" + coords.z + "/" + mc_x + "/" + mc_y + "/r." + c_x + "." + c_y + ".jpg";
+
+						if (checkFileExist(file)) {
+							return file;
+						} else {
+//							return("http://83.83.222.154/enschede_tiles/skull.png");
+						}
+
 					} else {
 						var mc_x; if ( coords.x >= 0 ) {	mc_x = Math.floor( coords.x/10 ); } else { mc_x = -Math.floor( -((coords.x+1)/10-1) ); }
 						var mc_y; if ( coords.y >= 0 ) {	mc_y = Math.floor( coords.y/10 ); } else { mc_y = -Math.floor( -((coords.y+1)/10-1) ); }
+						var file = "";
 						if (coords.z<18) {
-							return "http://83.83.222.154/map/" + coords.z + "/" + mc_x + "/" + mc_y + "/r." + coords.x + "." + coords.y + ".jpg";
+							file = "http://83.83.222.154/map/" + coords.z + "/" + mc_x + "/" + mc_y + "/r." + coords.x + "." + coords.y + ".jpg";
+//							return "http://83.83.222.154/map/" + coords.z + "/" + mc_x + "/" + mc_y + "/r." + coords.x + "." + coords.y + ".jpg";
 						} else {
-							return "http://83.83.222.154/map/" + coords.z + "/" + mc_x + "/" + mc_y + "/r." + coords.x + "." + coords.y + ".png";
+							file = "http://83.83.222.154/map/" + coords.z + "/" + mc_x + "/" + mc_y + "/r." + coords.x + "." + coords.y + ".png";
+//							return "http://83.83.222.154/map/" + coords.z + "/" + mc_x + "/" + mc_y + "/r." + coords.x + "." + coords.y + ".png";
 						}
+						if (checkFileExist(file)) {
+							return file;
+						} else {
+//							return("http://83.83.222.154/enschede_tiles/skull.png");
+						}
+
 					}
+					return "";
 
 <!--						return "http://83.83.222.154/cgi-bin/texture.cgi?skull.jpg";
 
